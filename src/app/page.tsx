@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { neon } from "@neondatabase/serverless";
-import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const sql = neon(process.env.DATABASE_URL!);
   const data = await sql`SELECT * FROM users`;
   console.log(data);
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/hello`, {
+  const response = await fetch(`${process.env.VERCEL_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/hello`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

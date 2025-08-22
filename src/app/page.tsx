@@ -21,7 +21,8 @@ const getBaseUrl = (): string => {
   }
   // Check for explicit API URL first
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    // append https:// protocol
+    return `https://${process.env.NEXT_PUBLIC_API_URL}`;
   }
 
   // Handle Vercel deployment URLs

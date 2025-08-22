@@ -3,11 +3,41 @@ import { neon } from "@neondatabase/serverless";
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Constructs a valid base URL for API calls
+ */
+const getBaseUrl = (): string => {
+  // Check for explicit API URL first
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Handle Vercel deployment URLs
+  if (process.env.VERCEL_URL) {
+    // VERCEL_URL doesn't include protocol, so we need to add it
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    // This might already include protocol, so we need to check
+    const url = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  }
+
+  // Default to localhost for development
+  return "http://localhost:3000";
+};
+
 export default async function Home() {
   const sql = neon(process.env.DATABASE_URL!);
   const data = await sql`SELECT * FROM users`;
   console.log(data);
-  const response = await fetch(`${process.env.VERCEL_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/hello`, {
+
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/api/hello`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,6 +46,7 @@ export default async function Home() {
   });
   const data2 = await response.json();
   console.log(data2);
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">

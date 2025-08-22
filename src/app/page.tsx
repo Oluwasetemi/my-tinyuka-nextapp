@@ -7,6 +7,10 @@ export const dynamic = 'force-dynamic';
  * Constructs a valid base URL for API calls
  */
 const getBaseUrl = (): string => {
+  console.log(process.env.NEXT_PUBLIC_API_URL);
+  console.log(process.env.VERCEL_URL);
+  console.log(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+
   // Check for explicit API URL first
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
@@ -56,6 +60,8 @@ export default async function Home() {
         <div className="text-2xl font-bold">
           Assignment 1: Setup the todo page and also display a single todo page
         </div>
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+        <pre>{JSON.stringify(data2, null, 2)}</pre>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a

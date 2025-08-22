@@ -5,11 +5,28 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Constructs a valid base URL for API calls
-*/
+ */
 const getBaseUrl = (): string => {
   console.log(process.env.NEXT_PUBLIC_API_URL);
   console.log(process.env.VERCEL_URL);
   console.log(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+
+  // Check for explicit API URL first
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const url = process.env.NEXT_PUBLIC_API_URL;
+    // If it already has a protocol, use it as-is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // Otherwise, assume it needs https://
+    return `https://${url}`;
+  }
+
+  // Handle Vercel deployment URLs
+  if (process.env.VERCEL_URL) {
+    // VERCEL_URL doesn't include protocol, so we need to add it
+    return `https://${process.env.VERCEL_URL}`;
+  }
 
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     // This might already include protocol, so we need to check
@@ -19,18 +36,6 @@ const getBaseUrl = (): string => {
     }
     return `https://${url}`;
   }
-  // Check for explicit API URL first
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    // append https:// protocol
-    return `https://${process.env.NEXT_PUBLIC_API_URL}`;
-  }
-
-  // Handle Vercel deployment URLs
-  if (process.env.VERCEL_URL) {
-    // VERCEL_URL doesn't include protocol, so we need to add it
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
 
   // Default to localhost for development
   return "http://localhost:3000";

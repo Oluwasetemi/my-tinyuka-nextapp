@@ -37,6 +37,7 @@ export default async function Home() {
   console.log(data);
 
   const baseUrl = getBaseUrl();
+  console.log(baseUrl);
   const response = await fetch(`${baseUrl}/api/hello`, {
     method: "POST",
     headers: {

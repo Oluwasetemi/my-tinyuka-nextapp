@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { neon } from "@neondatabase/serverless";
+import { db } from "@/db";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,8 +39,8 @@ const getBaseUrl = (): string => {
 };
 
 export default async function Home() {
-  const sql = neon(process.env.DATABASE_URL!);
-  const data = await sql`SELECT * FROM users`;
+  // const data = await db.select().from(users);
+  const data = await db.query.users.findMany();
   console.log(data);
 
   const baseUrl = getBaseUrl();

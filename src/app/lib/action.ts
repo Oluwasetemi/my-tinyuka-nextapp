@@ -1,4 +1,4 @@
-import { Todo } from "@/app/api/todos/route";
+import { NewTodo, Todo } from "@/types/database";
 
 async function getTodos() {
   const todos = await fetch("/api/todos");
@@ -15,12 +15,11 @@ async function postTodo(todo: Todo) {
 export async function createTodo(title: string, completed: boolean) {
   const todos = await getTodos();
 
-  const newTodo: Todo = {
-    id: (todos.length + 1).toString(),
+  const newTodo: NewTodo = {
     title,
     completed,
-    createdAt: new Date().toISOString(),
+    created_at: new Date(),
   };
 
-  await postTodo(newTodo);
+  await postTodo(newTodo as Todo);
 }

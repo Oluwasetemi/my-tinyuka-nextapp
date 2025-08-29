@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Todo } from "../api/todos/route";
+import type { Todo } from "@/types/database";
 import { redirect } from "next/navigation";
 
 export default function DeleteConfirmation({ todo }: { todo: Todo }) {
@@ -66,7 +66,7 @@ export default function DeleteConfirmation({ todo }: { todo: Todo }) {
           <div className="space-y-2">
             <p className="text-red-700"><strong>Title:</strong> {todo.title}</p>
             <p className="text-red-700"><strong>Status:</strong> {todo.completed ? "Completed" : "Pending"}</p>
-            <p className="text-red-700"><strong>Created:</strong> {new Date(todo.createdAt).toLocaleString()}</p>
+            <p className="text-red-700"><strong>Created:</strong> {new Date(todo.created_at).toLocaleString()}</p>
             <p className="text-red-700"><strong>ID:</strong> {todo.id}</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function DeleteConfirmation({ todo }: { todo: Todo }) {
             type="button"
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
             onClick={() => {
-              deleteTodo(todo.id);
+              deleteTodo(todo.id.toString());
             }}
           >
             Delete Todo

@@ -4,38 +4,37 @@ import type { Todo } from "@/app/api/todos/route";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-export async function getTodos() {
-  const todos = await fetch(`${baseUrl}/api/todos`);
-  const data = await todos.json();
-  return data.todos as Todo[];
+export async function getTodos(): Promise<Todo[]> {
+  const response = await fetch(`${baseUrl}/api/todos`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch todos");
+  }
+
+  const data = await response.json();
+  return data.todos;
 }
 
 /**
  * Creates a new todo
  */
 export async function createTodo(title: string, completed: boolean = false): Promise<Todo> {
-  const todos = await getTodos();
-
-  const newTodo: Todo = {
-    id: (todos.length + 1).toString(),
-    title,
-    completed,
-    createdAt: new Date().toISOString(),
-  };
-
   const response = await fetch(`${baseUrl}/api/todos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(newTodo),
+    body: JSON.stringify({ title, completed }),
   });
 
   if (!response.ok) {
     throw new Error("Failed to create todo");
   }
 
-  return newTodo;
+  const data = await response.json();
+  return data.todo;
 }
 
 /**

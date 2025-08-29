@@ -12,9 +12,33 @@ interface TodoPageProps {
   params: Promise<{ id: string }>;
 }
 
+/**
+ * Constructs a valid base URL for API calls that works in both development and production
+ */
+const getBaseUrl = (): string => {
+  // In production on Vercel, use the deployment URL
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // Check for explicit API URL
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const url = process.env.NEXT_PUBLIC_API_URL;
+    // If it already has a protocol, use it as-is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // Otherwise, assume it needs https://
+    return `https://${url}`;
+  }
+
+  // Fallback to localhost for development
+  return "http://localhost:3000";
+};
+
 async function getTodo(id: string): Promise<Todo | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const baseUrl = getBaseUrl();
     const response = await fetch(`${baseUrl}/api/todos`, {
       cache: "no-store",
     });
@@ -67,77 +91,47 @@ export default async function TodoPage({ params }: TodoPageProps) {
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-900">{todo.title}</h1>
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
+          <span
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
               todo.completed
                 ? "bg-green-100 text-green-800"
                 : "bg-yellow-100 text-yellow-800"
             }`}
           >
             {todo.completed ? "Completed" : "Pending"}
-          </div>
+          </span>
         </div>
 
         <div className="space-y-4 mb-8">
           <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Status
-            </h3>
-            <div className="flex items-center space-x-2 mt-1">
-              <div
-                className={`w-4 h-4 rounded-full border-2 ${
-                  todo.completed
-                    ? "bg-green-500 border-green-500"
-                    : "border-gray-300"
-                }`}
-              >
-                {todo.completed && (
-                  <svg
-                    className="w-3 h-3 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                )}
-              </div>
-              <span className="text-gray-900">
-                {todo.completed ? "Completed" : "Not completed"}
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Created
-            </h3>
-            <p className="text-gray-900 mt-1">
-              {new Date(todo.createdAt).toLocaleString()}
+            <h3 className="text-sm font-medium text-gray-500">Status</h3>
+            <p className="mt-1 text-lg text-gray-900">
+              {todo.completed ? "Completed" : "In Progress"}
             </p>
           </div>
-
           <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Todo ID
-            </h3>
-            <p className="text-gray-900 mt-1 font-mono text-sm">{todo.id}</p>
+            <h3 className="text-sm font-medium text-gray-500">Created</h3>
+            <p className="mt-1 text-lg text-gray-900">
+              {new Date(todo.createdAt).toLocaleDateString()} at{" "}
+              {new Date(todo.createdAt).toLocaleTimeString()}
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-500">ID</h3>
+            <p className="mt-1 text-lg text-gray-900 font-mono">{todo.id}</p>
           </div>
         </div>
 
         <div className="flex space-x-4">
           <Link
             href={`/todos/${todo.id}/edit`}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
           >
             Edit Todo
           </Link>
           <Link
             href={`/todos/${todo.id}/delete`}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
           >
             Delete Todo
           </Link>

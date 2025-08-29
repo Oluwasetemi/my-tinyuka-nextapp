@@ -1,9 +1,49 @@
 import Link from "next/link";
-import { getTodos } from "@/app/lib/actions";
 
-export const dynamic = "force-dynamic";
+interface Todo {
+  readonly id: string;
+  readonly title: string;
+  readonly completed: boolean;
+  readonly createdAt: string;
+}
 
+/**
+ * Constructs a valid base URL for API calls that works in both development and production
+ */
+const getBaseUrl = (): string => {
+  // In production on Vercel, use the deployment URL
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
 
+  // Check for explicit API URL
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const url = process.env.NEXT_PUBLIC_API_URL;
+    // If it already has a protocol, use it as-is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // Otherwise, assume it needs https://
+    return `https://${url}`;
+  }
+
+  // Fallback to localhost for development
+  return "http://localhost:3000";
+};
+
+async function getTodos(): Promise<Todo[]> {
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/api/todos`, {
+    cache: "no-store", // Disable caching for real-time data
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch todos");
+  }
+
+  const data = await response.json();
+  return data.todos;
+}
 
 export default async function TodosPage() {
   const todos = await getTodos();
@@ -21,31 +61,57 @@ export default async function TodosPage() {
 
       {todos?.length === 0 || todos === null ? (
         <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-medium text-gray-900 mb-2">
-            No todos yet
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Get started by creating your first todo
+          <div className="mx-auto h-12 w-12 text-gray-400">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No todos</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Get started by creating a new todo.
           </p>
-          <Link
-            href="/todos/new"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            Create Your First Todo
-          </Link>
+          <div className="mt-6">
+            <Link
+              href="/todos/new"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <svg
+                className="-ml-1 mr-2 h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              New Todo
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
-          {todos?.map((todo) => (
+          {todos.map((todo) => (
             <div
               key={todo.id}
-              className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                   <div
-                    className={`w-4 h-4 rounded-full border-2 ${
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                       todo.completed
                         ? "bg-green-500 border-green-500"
                         : "border-gray-300"
@@ -53,7 +119,7 @@ export default async function TodosPage() {
                   >
                     {todo.completed && (
                       <svg
-                        className="w-3 h-3 text-white"
+                        className="w-2 h-2 text-white"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -76,22 +142,28 @@ export default async function TodosPage() {
                       {todo.title}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Created: {new Date(todo.createdAt).toLocaleDateString()}
+                      Created {new Date(todo.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div className="flex space-x-2">
                   <Link
                     href={`/todos/${todo.id}`}
-                    className="text-blue-600 hover:text-blue-800 px-3 py-1 rounded text-sm font-medium transition-colors"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                   >
                     View
                   </Link>
                   <Link
                     href={`/todos/${todo.id}/edit`}
-                    className="text-green-600 hover:text-green-800 px-3 py-1 rounded text-sm font-medium transition-colors"
+                    className="text-green-600 hover:text-green-800 text-sm font-medium"
                   >
                     Edit
+                  </Link>
+                  <Link
+                    href={`/todos/${todo.id}/delete`}
+                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                  >
+                    Delete
                   </Link>
                 </div>
               </div>

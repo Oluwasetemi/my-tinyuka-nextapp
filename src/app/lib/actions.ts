@@ -1,6 +1,6 @@
 "use server";
 
-import type { Todo } from "@/app/api/todos/route";
+import type { TodosResponse } from "@/types/database";
 
 /**
  * Constructs a valid base URL for API calls that works in both development and production
@@ -28,7 +28,7 @@ const getBaseUrl = (): string => {
 
 const baseUrl = getBaseUrl();
 
-export async function getTodos(): Promise<Todo[]> {
+export async function getTodos(): Promise<TodosResponse> {
   const response = await fetch(`${baseUrl}/api/todos`, {
     cache: "no-store",
   });
@@ -38,13 +38,13 @@ export async function getTodos(): Promise<Todo[]> {
   }
 
   const data = await response.json();
-  return data.todos;
+  return data;
 }
 
 /**
  * Creates a new todo
  */
-export async function createTodo(title: string, completed: boolean = false): Promise<Todo> {
+export async function createTodo(title: string, completed: boolean = false): Promise<TodosResponse> {
   const response = await fetch(`${baseUrl}/api/todos`, {
     method: "POST",
     headers: {
@@ -58,13 +58,13 @@ export async function createTodo(title: string, completed: boolean = false): Pro
   }
 
   const data = await response.json();
-  return data.todo;
+  return data;
 }
 
 /**
  * Updates an existing todo
  */
-export async function updateTodo(id: string, title: string, completed: boolean): Promise<Todo> {
+export async function updateTodo(id: string, title: string, completed: boolean): Promise<TodosResponse> {
   const response = await fetch(`${baseUrl}/api/todos`, {
     method: "PUT",
     headers: {
@@ -78,7 +78,7 @@ export async function updateTodo(id: string, title: string, completed: boolean):
   }
 
   const data = await response.json();
-  return data.todo as Todo;
+  return data;
 }
 
 /**
@@ -92,6 +92,8 @@ export async function deleteTodo(id: string): Promise<void> {
     },
     body: JSON.stringify({ id }),
   });
+
+  console.log(response.ok);
 
   if (!response.ok) {
     throw new Error("Failed to delete todo");

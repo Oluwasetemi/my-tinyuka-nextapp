@@ -1,7 +1,7 @@
 
 import DeleteConfirmation from "@/app/components/delete-confirmation";
 import { notFound } from "next/navigation";
-import type { Todo } from "@/app/api/todos/route";
+import type { Todo } from "@/types/database";
 
 interface DeleteTodoPageProps {
   params: Promise<{ id: string }>;
@@ -43,7 +43,7 @@ async function getTodo(id: string): Promise<Todo | null> {
     }
 
     const data = await response.json();
-    const todo = data.todos.find((t: Todo) => t.id === id);
+    const todo = data.todos.find((t: Todo) => t.id === parseInt(id));
     return todo || null;
   } catch (error) {
     console.error("Error fetching todo:", error);

@@ -2,13 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { updateTodo } from "@/app/lib/actions";
 import { redirect } from "next/navigation";
-
-interface Todo {
-  readonly id: string;
-  readonly title: string;
-  readonly completed: boolean;
-  readonly createdAt: string;
-}
+import { getTodo } from "../page";
 
 interface EditTodoPageProps {
   params: Promise<{ id: string }>;
@@ -38,25 +32,7 @@ const getBaseUrl = (): string => {
   return "http://localhost:3000";
 };
 
-async function getTodo(id: string): Promise<Todo | null> {
-  try {
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/todos`, {
-      cache: "no-store",
-    });
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    const todo = data.todos.find((t: Todo) => t.id === id);
-    return todo || null;
-  } catch (error) {
-    console.error("Error fetching todo:", error);
-    return null;
-  }
-}
 
 export default async function EditTodoPage({ params }: EditTodoPageProps) {
   const { id } = await params;
@@ -76,7 +52,7 @@ export default async function EditTodoPage({ params }: EditTodoPageProps) {
       throw new Error("Title is required");
     }
 
-    await updateTodo(todo?.id ?? "", title.trim(), completed);
+    await updateTodo(todo?.id?.toString() ?? "", title.trim(), completed);
     redirect(`/todos/${todo?.id}`);
   }
 

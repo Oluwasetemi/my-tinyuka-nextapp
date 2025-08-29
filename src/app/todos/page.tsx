@@ -1,3 +1,5 @@
+import { db } from "@/db";
+import { PartialTodo } from "@/types/database";
 import Link from "next/link";
 
 interface Todo {
@@ -31,18 +33,9 @@ const getBaseUrl = (): string => {
   return "http://localhost:3000";
 };
 
-async function getTodos(): Promise<Todo[]> {
-  const baseUrl = getBaseUrl();
-  const response = await fetch(`${baseUrl}/api/todos`, {
-    cache: "no-store", // Disable caching for real-time data
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch todos");
-  }
-
-  const data = await response.json();
-  return data.todos;
+export async function getTodos() {
+  const todos = await db.query.todos.findMany();
+  return todos;
 }
 
 export default async function TodosPage() {
@@ -142,7 +135,7 @@ export default async function TodosPage() {
                       {todo.title}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Created {new Date(todo.createdAt).toLocaleDateString()}
+                      Created {new Date(todo.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

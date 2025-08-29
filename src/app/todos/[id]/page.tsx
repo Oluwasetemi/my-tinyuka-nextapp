@@ -1,12 +1,8 @@
+import { db } from "@/db";
+import { todos } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-interface Todo {
-  readonly id: string;
-  readonly title: string;
-  readonly completed: boolean;
-  readonly createdAt: string;
-}
 
 interface TodoPageProps {
   params: Promise<{ id: string }>;
@@ -36,24 +32,11 @@ const getBaseUrl = (): string => {
   return "http://localhost:3000";
 };
 
-async function getTodo(id: string): Promise<Todo | null> {
-  try {
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/todos`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    const todo = data.todos.find((t: Todo) => t.id === id);
-    return todo || null;
-  } catch (error) {
-    console.error("Error fetching todo:", error);
-    return null;
-  }
+export async function getTodo(id: string) {
+  const todo = await db.query.todos.findFirst({
+    where: eq(todos.id, parseInt(id)),
+  });
+  return todo;
 }
 
 export default async function TodoPage({ params }: TodoPageProps) {
@@ -112,8 +95,8 @@ export default async function TodoPage({ params }: TodoPageProps) {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Created</h3>
             <p className="mt-1 text-lg text-gray-900">
-              {new Date(todo.createdAt).toLocaleDateString()} at{" "}
-              {new Date(todo.createdAt).toLocaleTimeString()}
+              {new Date(todo.created_at).toLocaleDateString()} at{" "}
+              {new Date(todo.created_at).toLocaleTimeString()}
             </p>
           </div>
           <div>

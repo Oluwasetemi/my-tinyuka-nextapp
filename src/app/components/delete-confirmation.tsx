@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { deleteTodoAction } from "@/app/lib/actions";
 import { useRouter } from "next/navigation";
-import type { Todo } from "@/app/api/todos/route";
+import type { Todo } from "@/types/database";
 
 interface DeleteConfirmationProps {
   todo: Todo;
@@ -14,7 +14,7 @@ export default function DeleteConfirmation({ todo }: DeleteConfirmationProps) {
 
   async function handleDelete() {
     try {
-      await deleteTodoAction(todo.id);
+      await deleteTodoAction(todo.id.toString());
       router.push("/todos");
     } catch (error) {
       console.error("Failed to delete todo:", error);
@@ -90,7 +90,7 @@ export default function DeleteConfirmation({ todo }: DeleteConfirmationProps) {
           </p>
           <p className="text-gray-700">
             <span className="font-medium">Created:</span>{" "}
-            {new Date(todo.createdAt).toLocaleDateString()}
+            {new Date(todo.created_at).toLocaleDateString()}
           </p>
         </div>
 

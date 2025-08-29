@@ -76,7 +76,7 @@ export const todos = pgTable("todos", {
   completed_at: timestamp(),
 
   // Due date and scheduling
-  due_date: date(),
+  due_date: timestamp(),
   reminder_at: timestamp(),
 
   // User relationship

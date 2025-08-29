@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
 
 export const dynamic = 'force-dynamic';
@@ -7,10 +8,6 @@ export const dynamic = 'force-dynamic';
  * Constructs a valid base URL for API calls
  */
 const getBaseUrl = (): string => {
-  console.log(process.env.NEXT_PUBLIC_API_URL);
-  console.log(process.env.VERCEL_URL);
-  console.log(process.env.VERCEL_PROJECT_PRODUCTION_URL);
-
   // Check for explicit API URL first
   if (process.env.NEXT_PUBLIC_API_URL) {
     const url = process.env.NEXT_PUBLIC_API_URL;
@@ -59,15 +56,52 @@ export default async function Home() {
   console.log(data2);
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-black">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1>Hello World</h1>
-        {/* TODO: setup the todo page and also display a single todo page */}
-        <div className="text-2xl font-bold">
-          Assignment 1: Setup the todo page and also display a single todo page
+        <h1 className="text-4xl font-bold text-white">Hello World</h1>
+
+        {/* Todo App Section */}
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl w-full">
+          <h2 className="text-2xl font-bold mb-4">Todo Application</h2>
+          <p className="text-gray-600 mb-6">
+            Assignment 1: Setup the todo page and also display a single todo page
+          </p>
+
+          <div className="flex flex-col items-center space-y-4">
+            <Link
+              href="/todos"
+              className="w-lg block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center transition-colors hover:scale-105"
+            >
+              View All Todos
+            </Link>
+
+            <Link
+              href="/todos/new"
+              className="w-lg block bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-center transition-colors"
+            >
+              Create New Todo
+            </Link>
+          </div>
         </div>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-        <pre>{JSON.stringify(data2, null, 2)}</pre>
+
+        {/* API Data Display */}
+        <div className="bg-gray-50 text-black rounded-lg p-6 max-w-4xl w-full">
+          <h3 className="text-lg font-semibold mb-4">API Response Data</h3>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-gray-700">Database Users:</h4>
+              <pre className="bg-white p-3 rounded text-sm overflow-auto">
+                {JSON.stringify(data, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-700">Hello API Response:</h4>
+              <pre className="bg-white p-3 rounded text-sm overflow-auto">
+                {JSON.stringify(data2, null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a

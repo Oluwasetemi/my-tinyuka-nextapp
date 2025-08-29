@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-interface Todo {
+export interface Todo {
   id: string;
   title: string;
   completed: boolean;
   createdAt: string;
 }
 
-type ReadonlyTodo = Readonly<Todo>;
+export type ReadonlyTodo = Readonly<Todo>;
 
 interface CreateTodoRequest {
   readonly title: string;

@@ -52,8 +52,8 @@ export default async function EditTodoPage({ params }: EditTodoPageProps) {
       throw new Error("Title is required");
     }
 
-    await updateTodo(todo.id, title.trim(), completed);
-    redirect(`/todos/${todo.id}`);
+    await updateTodo(todo?.id ?? "", title.trim(), completed);
+    redirect(`/todos/${todo?.id}`);
   }
 
   return (

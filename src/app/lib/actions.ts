@@ -4,6 +4,11 @@ import type { Todo } from "@/app/api/todos/route";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+export type TodoActionState = 
+  | { status: 'error'; error: string }
+  | { status: 'success'; message: string }
+  | null
+
 /**
  * Constructs a valid base URL for API calls that works in both development and production
  */
@@ -46,62 +51,82 @@ export async function getTodos(): Promise<Todo[]> {
 /**
  * Creates a new todo
  */
-export async function createTodo(formData: FormData){
-
-    const title = formData.get("title") as string;
-    const completed = formData.get("completed") === "on";
-
-    if (!title || title.trim().length === 0) {
-        throw new Error("Title is required");
-    }
-
-    const response = await fetch(`${baseUrl}/api/todos`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, completed }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to create todo");
-    }
+export async function createTodo(prevState: TodoActionState, formData: FormData): Promise<TodoActionState>{
+    try {
+        const title = formData.get("title") as string;
+        const completed = formData.get("completed") === "on";
     
-    revalidatePath("/todos");
-    redirect("/todos");
+        if (!title || title.trim().length === 0) {
+            return { status: 'error', error: 'Title is required' }
+        }
+    
+        const response = await fetch(`${baseUrl}/api/todos`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ title, completed }),
+        });
+    
+        if (!response.ok) {
+            throw new Error("Failed to create todo");
+        }
+        
+        revalidatePath("/todos");
+        redirect("/todos");
+
+        return { 
+            status: 'success', 
+            message: 'Todo created successfully!' 
+        }
+
+    } catch {
+        return { 
+            status: 'error', 
+            error: 'An unexpected error occurred' 
+        }
+    }
 }
 
 /**
  * Updates an existing todo
  */
-export async function updateTodo(formData: FormData): Promise<void> {
+export async function updateTodo(prevState:TodoActionState, formData: FormData): Promise<TodoActionState> {
+    try {
+        const title = formData.get("title") as string;
+        const completed = formData.get("completed") === "on";
+        const id = formData.get('id') as string
+        
+        if (!title || title.trim().length === 0) {
+            return { status: 'error', error: 'Title is required' }
+        }
     
-    // console.log(formData)
-
-    const title = formData.get("title") as string;
-    const completed = formData.get("completed") === "on";
-    const id = formData.get('id') as string
-
-    // console.log(title, completed,id)
+        const response = await fetch(`${baseUrl}/api/todos`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id, title, completed }),
+        });
     
-    if (!title || title.trim().length === 0) {
-        throw new Error("Title is required");
+        if (!response.ok) {
+            throw new Error("Failed to create todo");
+        }
+    
+        revalidatePath('/todos')
+        redirect(`/todos`);
+
+        return { 
+            status: 'success', 
+            message: 'Todo created successfully!' 
+        }
+
+    } catch {
+        return { 
+            status: 'error', 
+            error: 'An unexpected error occurred' 
+        }
     }
-
-    const response = await fetch(`${baseUrl}/api/todos`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, title, completed }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to update todo");
-    }
-
-    revalidatePath('/todos')
-    redirect(`/todos`);
 }
 
 /**

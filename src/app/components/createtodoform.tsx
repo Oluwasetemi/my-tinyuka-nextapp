@@ -4,17 +4,15 @@
 import Link from "next/link";
 import { createTodo } from "@/app/lib/actions";
 import { useActionState } from "react";
-
+import type { TodoActionState } from "@/app/lib/actions";
 
 function CreateTodoForm() {
     const [state, formAction, isPending] = useActionState(
-        async (prevState: unknown, formData: FormData) => {
-            return await createTodo(formData);
+        async (prevState: TodoActionState, formData: FormData) => {
+            return await createTodo(prevState, formData);
         },
         null
     );
-
-
 
     return (
         <form className="space-y-6" action={formAction}>

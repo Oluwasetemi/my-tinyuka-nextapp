@@ -5,6 +5,7 @@ import { updateTodo } from "../lib/actions";
 import { Todo } from "../types";
 import { useActionState} from "react";
 import { Spinner } from "@/components/ui/spinner";
+import type { TodoActionState } from "../lib/actions";
 
 type UpdateTodoFormProp = {
     todo: Todo,
@@ -13,8 +14,8 @@ type UpdateTodoFormProp = {
 
 function UpdateTodoForm({todo, id}:UpdateTodoFormProp) {
     const [state, formAction, isPending] = useActionState(
-        async (prevState: unknown, formData: FormData) => {
-            return await updateTodo(formData);
+        async (prevState: TodoActionState, formData: FormData) => {
+            return await updateTodo(prevState, formData);
         },
         null
     );

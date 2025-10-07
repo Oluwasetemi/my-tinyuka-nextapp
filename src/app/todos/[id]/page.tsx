@@ -1,92 +1,50 @@
+import { getTodo, getTodos } from "@/app/lib/data-service";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-interface Todo {
-  readonly id: string;
-  readonly title: string;
-  readonly completed: boolean;
-  readonly createdAt: string;
-}
-
 interface TodoPageProps {
-  params: Promise<{ id: string }>;
+    params: Promise<{ id: string }>;
 }
 
-/**
- * Constructs a valid base URL for API calls that works in both development and production
- */
-const getBaseUrl = (): string => {
-  // In production on Vercel, use the deployment URL
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
-  // Check for explicit API URL
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    const url = process.env.NEXT_PUBLIC_API_URL;
-    // If it already has a protocol, use it as-is
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-    // Otherwise, assume it needs https://
-    return `https://${url}`;
-  }
-
-  // Fallback to localhost for development
-  return "http://localhost:3000";
-};
-
-async function getTodo(id: string): Promise<Todo | null> {
-  try {
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/todos`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    const todo = data.todos.find((t: Todo) => t.id === id);
-    return todo || null;
-  } catch (error) {
-    console.error("Error fetching todo:", error);
-    return null;
-  }
+export async function generateStaticParams() {
+    const todos = await getTodos()
+    return todos.map(todo => ({
+        id: todo.id.toString()
+    }))
 }
+
 
 export default async function TodoPage({ params }: TodoPageProps) {
-  const { id } = await params;
-  const todo = await getTodo(id);
+    const { id } = await params;
+    const todo = await getTodo(id);
 
-  if (!todo) {
-    notFound();
-  }
+    if (!todo) {
+        notFound();
+    }
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <Link
-          href="/todos"
-          className="text-blue-600 hover:text-blue-800 flex items-center space-x-2 transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span>Back to Todos</span>
-        </Link>
-      </div>
+        <div className="mb-6">
+            <Link
+            href="/todos"
+            className="text-blue-600 hover:text-blue-800 flex items-center space-x-2 transition-colors"
+            >
+            <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+                />
+            </svg>
+            <span>Back to Todos</span>
+            </Link>
+        </div>
 
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="flex items-center justify-between mb-6">

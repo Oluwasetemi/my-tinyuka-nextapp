@@ -2,25 +2,13 @@
 
 import Link from "next/link";
 import { deleteTodoAction } from "@/app/lib/actions";
-import { useRouter } from "next/navigation";
 import type { Todo } from "@/app/api/todos/route";
 
 interface DeleteConfirmationProps {
-  todo: Todo;
+    todo: Todo;
 }
 
 export default function DeleteConfirmation({ todo }: DeleteConfirmationProps) {
-  const router = useRouter();
-
-  async function handleDelete() {
-    try {
-      await deleteTodoAction(todo.id);
-      router.push("/todos");
-    } catch (error) {
-      console.error("Failed to delete todo:", error);
-      // You could add error handling UI here
-    }
-  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -77,6 +65,9 @@ export default function DeleteConfirmation({ todo }: DeleteConfirmationProps) {
             <span className="font-medium">Title:</span> {todo.title}
           </p>
           <p className="text-gray-700">
+            <span className="font-medium">ID:</span> {todo.id}
+          </p>
+          <p className="text-gray-700">
             <span className="font-medium">Status:</span>{" "}
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -102,7 +93,7 @@ export default function DeleteConfirmation({ todo }: DeleteConfirmationProps) {
             Cancel
           </Link>
           <button
-            onClick={handleDelete}
+            onClick={() => deleteTodoAction(todo.id)}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Delete Todo

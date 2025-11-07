@@ -80,7 +80,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: "Invalid JSON in request body" },
+      { error: "Invalid JSON in request body", },
       { status: 400 }
     );
   }

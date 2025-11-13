@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface TodoPageProps {
-    params: Promise<{ id: string }>;
+    params: { id: string };
 }
 
 export async function generateStaticParams() {
@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 
 
 export default async function TodoPage({ params }: TodoPageProps) {
-    const { id } = await params;
+    const { id } = params;
     const todo = await getTodo(id);
 
     if (!todo) {

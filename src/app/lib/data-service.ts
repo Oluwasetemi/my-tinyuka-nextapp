@@ -39,16 +39,26 @@ export const getBaseUrl = (): string => {
 
 export async function getTodos(): Promise<Todo[]> {
     const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/todos`, {
-        cache: "force-cache", 
-    });
+    try {
+        const response = await fetch(`${baseUrl}/api/todos`, {
+            cache: "force-cache", 
+        });
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch todos");
+        if (!response.ok) {
+            // If response is not ok, it might be a 404 or other HTTP error,
+            // but not necessarily a network error. We can still try to parse JSON
+            // or handle it as an empty array if the API is expected to return an empty list.
+            // For build time, if the API is not available, this will likely be caught by the outer catch.
+            return [];
+        }
+
+        const data = await response.json();
+        return data.todos;
+    } catch (error) {
+        console.error("Error fetching todos during build:", error);
+        // Return an empty array if fetch fails, especially during build when API might not be running
+        return [];
     }
-
-    const data = await response.json();
-    return data.todos;
 }
 
 export async function getTodo(id: string): Promise<Todo | null> {
